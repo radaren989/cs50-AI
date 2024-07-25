@@ -96,7 +96,9 @@ def shortest_path(source, target):
     queue = QueueFrontier()
     queue.add(sourceNode)
     visited = []
-
+    if target == source:
+        return list()
+    
     while not queue.empty():
         node = queue.remove()
         visited.append(node.state)
@@ -111,8 +113,8 @@ def shortest_path(source, target):
                     newAction = node.action.copy()
                     newAction.append(neighbour)
                     queue.add(Node(state=neighbour[1], parent=node, action=newAction))
-
-
+    
+    return None
 
 
 
