@@ -11,7 +11,7 @@ def main():
     #if len(sys.argv) != 2:
     #    sys.exit("Usage: python pagerank.py corpus")
     #corpus = crawl(sys.argv[1])
-    corpus = crawl("corpus0")
+    corpus = crawl("test")
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
@@ -104,7 +104,7 @@ def sample_pagerank(corpus, damping_factor, n):
 
 
 def random_based_on_probability(probability_distribution):
-    random_value = random.random() # between 1-0
+    random_value = random.random()*sum(x for x in probability_distribution.values()) # between 1-0
     cumulative_probability = 0.0
     for key, value in probability_distribution.items():
         cumulative_probability += value
@@ -118,10 +118,37 @@ def iterate_pagerank(corpus, damping_factor):
 
     Return a dictionary where keys are page names, and values are
     their estimated PageRank value (a value between 0 and 1). All
-    PageRank values should sum to 1.
+    PageRank values should sum to 1
     """
-    raise NotImplementedError
 
+    probablity_distribution = {key: 1 / len(corpus) for key in corpus}
+    resolution = 0.001
+
+    while True:
+        highest_change = float("-inf")
+        new_pr = {}
+        for key in corpus:
+            
+            sum_pr = 0.0
+            for linked_page in corpus:
+                if key in corpus[linked_page]:
+                    sum_pr += probablity_distribution[linked_page]/len(corpus[linked_page])
+                if len(corpus[linked_page]) <= 0:
+                    sum_pr += probablity_distribution[linked_page] / len(corpus)
+
+            result =  (1 - damping_factor ) / len(corpus) + damping_factor*sum_pr
+            change = abs(result - probablity_distribution[key])
+            if change > highest_change:
+                highest_change = change
+
+            new_pr[key] = result            
+
+        probablity_distribution = new_pr
+
+        if resolution > highest_change:
+            break
+
+    return probablity_distribution
 
 if __name__ == "__main__":
     main()
